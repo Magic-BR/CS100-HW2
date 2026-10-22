@@ -11,10 +11,16 @@ int main(int argc, char *argv[])
     /* TODO: your code here */
     (void)argc;
     (void)argv;
-      int i = 1;
+       int i = 1;
     while (i < argc)
     {
-        if (strcmp(argv[i], "-Wall") == 0)
+        if (strncmp(argv[i], "-std=", 5) == 0)
+        {
+            char *suffix = argv[i] + 5;
+            printf("-std=%s: Set the language standard to %s.\n", suffix, suffix);
+            i++;
+        }
+        else if (strcmp(argv[i], "-Wall") == 0)
         {
             printf("-Wall: Enable all the warnings about constructions that some users consider questionable, and that are easy to avoid (or modify to prevent the warning).\n");
             i++;
@@ -44,29 +50,6 @@ int main(int argc, char *argv[])
             printf("-I %s: Add the directory %s to the list of directories to be searched for header files during preprocessing.\n", argv[i+1], argv[i+1]);
             i += 2;
         }
-        else if (strncmp(argv[i], "-std=", 5) == 0)
-        {
-            char *suffix = argv[i] + 5;
-            char desc[256];
-            if (strncmp(suffix, "gnu++", 5) == 0)
-            {
-                snprintf(desc, sizeof(desc), "GNU dialect of %s", suffix + 3);
-            }
-            else if (strncmp(suffix, "gnu", 3) == 0)
-            {
-                snprintf(desc, sizeof(desc), "GNU dialect of %s", suffix + 3);
-            }
-            else if (strncmp(suffix, "c++", 3) == 0)
-            {
-                snprintf(desc, sizeof(desc), "ISO %s", suffix);
-            }
-            else
-            {
-                snprintf(desc, sizeof(desc), "ISO %s", suffix);
-            }
-            printf("-std=%s: Set the language standard to %s.\n", suffix, desc);
-            i++;
-        }
         else
         {
             char *ext = strrchr(argv[i], '.');
@@ -74,23 +57,16 @@ int main(int argc, char *argv[])
             if (ext != NULL)
             {
                 if (strcmp(ext, ".c") == 0)
-                {
                     file_type = "C source file";
-                }
                 else if (strcmp(ext, ".h") == 0)
-                {
                     file_type = "C/C++ header file";
-                }
                 else if (strcmp(ext, ".cpp") == 0 || strcmp(ext, ".cc") == 0 || strcmp(ext, ".cxx") == 0)
-                {
                     file_type = "C++ source file";
-                }
                 else if (strcmp(ext, ".hpp") == 0 || strcmp(ext, ".hxx") == 0)
-                {
                     file_type = "C++ header file";
-                }
             }
-            printf("%s: %s as input file.\n", argv[i], file_type);
+            // =========改动重点：删掉 " as input file." =========
+            printf("%s: %s\n", argv[i], file_type);
             i++;
         }
     }
