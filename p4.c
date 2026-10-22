@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     (void)argc;
     (void)argv;
    int i = 1;
-      while (i < argc)
+     while (i < argc)
     {
         if (strcmp(argv[i], "-Wall") == 0)
         {
@@ -37,73 +37,66 @@ int main(int argc, char *argv[])
         else if (strcmp(argv[i], "-o") == 0)
         {
             printf("-o %s: Place the primary output in file %s.\n", argv[i+1], argv[i+1]);
-            i += 2;
+            i++;
         }
         else if (strcmp(argv[i], "-I") == 0)
         {
             printf("-I %s: Add the directory %s to the list of directories to be searched for header files during preprocessing.\n", argv[i+1], argv[i+1]);
-            i += 2;
-        }
-        else if (strncmp(argv[i], "-std=", 5) == 0)
-        {
-            char *suffix = argv[i] + 5;
-            char buf[128];
-            char type[32];
-            strcpy(buf, suffix);
-            if (buf[0] == 'c' && buf[1] != '+')
-            {
-                snprintf(type, sizeof(type), "ISO %s", buf);
-            }
-            else if (strstr(buf, "c++") == buf)
-            {
-                snprintf(type, sizeof(type), "ISO %s", buf);
-            }
-            else if (strstr(buf, "gnu") == buf)
-            {
-                char *inner = buf + 3;
-                if (inner[0] == 'c' && inner[1] != '+')
-                {
-                    snprintf(type, sizeof(type), "GNU dialect of %s", inner);
-                }
-                else if (strstr(inner, "c++") == inner)
-                {
-                    snprintf(type, sizeof(type), "GNU dialect of %s", inner);
-                }
-            }
-            printf("-std=%s: Set the language standard to %s.\n", suffix, type);
             i++;
         }
         else
         {
-            char *fn = argv[i];
-            char *ext = strrchr(fn, '.');
-            char *desc;
-            if (ext == NULL)
+            if (i >= 2 && strcmp(argv[i-1], "-o") == 0)
             {
-                desc = "unknown";
+                printf("%s: output file name.\n", argv[i]);
+                i++;
             }
-            else if (strcmp(ext, ".c") == 0)
+            else if (i >= 2 && strcmp(argv[i-1], "-I") == 0)
             {
-                desc = "C source code";
+                printf("%s: include directory name.\n", argv[i]);
+                i++;
             }
-            else if (strcmp(ext, ".h") == 0)
+            else if (strncmp(argv[i], "-std=", 5) == 0)
             {
-                desc = "C/C++ header file";
-            }
-            else if (strcmp(ext, ".cpp") == 0 || strcmp(ext, ".cc") == 0 || strcmp(ext, ".cxx") == 0)
-            {
-                desc = "C++ source code";
-            }
-            else if (strcmp(ext, ".hpp") == 0 || strcmp(ext, ".hxx") == 0)
-            {
-                desc = "C++ header file";
+                char *suffix = argv[i] + 5;
+                char type[128];
+                if (strncmp(suffix, "c++", 3) == 0)
+                {
+                    snprintf(type, sizeof(type), "ISO %s", suffix);
+                }
+                else if (strncmp(suffix, "gnu++", 5) == 0)
+                {
+                    snprintf(type, sizeof(type), "GNU dialect of %s", suffix+3);
+                }
+                else if (strncmp(suffix, "gnu", 3) == 0)
+                {
+                    snprintf(type, sizeof(type), "GNU dialect of %s", suffix+3);
+                }
+                else
+                {
+                    snprintf(type, sizeof(type), "ISO %s", suffix);
+                }
+                printf("-std=%s: Set the language standard to %s.\n", suffix, type);
+                i++;
             }
             else
             {
-                desc = "unknown";
+                char *ext = strrchr(argv[i], '.');
+                const char *desc = "unknown";
+                if (ext != NULL)
+                {
+                    if (strcmp(ext, ".c") == 0)
+                        desc = "C source code";
+                    else if (strcmp(ext, ".h") == 0)
+                        desc = "C/C++ header file";
+                    else if (strcmp(ext, ".cpp") == 0 || strcmp(ext, ".cc") == 0 || strcmp(ext, ".cxx") == 0)
+                        desc = "C++ source code";
+                    else if (strcmp(ext, ".hpp") == 0 || strcmp(ext, ".hxx") == 0)
+                        desc = "C++ header file";
+                }
+                printf("%s: %s as input file.\n", argv[i], desc);
+                i++;
             }
-            printf("%s: %s as input file.\n", fn, desc);
-            i++;
         }
     }
     return 0;
