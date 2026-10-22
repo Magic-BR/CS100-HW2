@@ -11,94 +11,71 @@ int main(int argc, char *argv[])
     /* TODO: your code here */
     (void)argc;
     (void)argv;
-   int i = 1;
-     while (i < argc)
-    {
-        if (strcmp(argv[i], "-Wall") == 0)
-        {
+    for (int i = 1; i < argc; i++) {
+        char *arg = argv[i];
+
+        if (strcmp(arg, "-Wall") == 0) {
             printf("-Wall: Enable all the warnings about constructions that some users consider questionable, and that are easy to avoid (or modify to prevent the warning).\n");
-            i++;
-        }
-        else if (strcmp(argv[i], "-Wpedantic") == 0)
-        {
+        } 
+        else if (strcmp(arg, "-Wpedantic") == 0) {
             printf("-Wpedantic: Issue all the warnings demanded by strict ISO C and ISO C++ and reject all programs that use forbidden extensions.\n");
-            i++;
-        }
-        else if (strcmp(argv[i], "-Wextra") == 0)
-        {
+        } 
+        else if (strcmp(arg, "-Wextra") == 0) {
             printf("-Wextra: Enable some extra warning flags that are not enabled by -Wall.\n");
-            i++;
-        }
-        else if (strcmp(argv[i], "-Werror") == 0)
-        {
+        } 
+        else if (strcmp(arg, "-Werror") == 0) {
             printf("-Werror: Make all warnings into errors.\n");
-            i++;
         }
-        else if (strcmp(argv[i], "-o") == 0)
-        {
+        else if (strcmp(arg, "-o") == 0) {
+            // 题目保证参数合法，所以 i+1 一定存在           
             printf("-o %s: Place the primary output in file %s.\n", argv[i+1], argv[i+1]);
-            i++;
-        }
-        else if (strcmp(argv[i], "-I") == 0)
-        {
+            i++; // 跳过下一个参数，因为它已经被处理了
+        } 
+        else if (strcmp(arg, "-I") == 0) {
             printf("-I %s: Add the directory %s to the list of directories to be searched for header files during preprocessing.\n", argv[i+1], argv[i+1]);
             i++;
+        else if (strncmp(arg, "-std=", 5) == 0) {
+            char *std_val = arg + 5; 
+            
+            char *prefix = "";
+            if (strncmp(std_val, "c++", 3) == 0) {
+                prefix = "ISO C++";
+                std_val += 3; // 移动指针跳过 "c++"
+            } else if (strncmp(std_val, "gnu++", 5) == 0) {
+                prefix = "GNU dialect of C++";
+                std_val += 5; // 移动指针跳过 "gnu++"
+            } else if (strncmp(std_val, "gnu", 3) == 0) {
+                prefix = "GNU dialect of C";
+                std_val += 3; // 移动指针跳过 "gnu"
+            } else if (strncmp(std_val, "c", 1) == 0) {
+                prefix = "ISO C";
+                std_val += 1; // 移动指针跳过 "c"
+            }
+            
+            printf("-std=%s: Set the language standard to %s %s.\n", arg + 5, prefix, std_val);
         }
-        else
-        {
-            if (i >= 2 && strcmp(argv[i-1], "-o") == 0)
-            {
-                printf("%s: output file name.\n", argv[i]);
-                i++;
+
+        else {
+            char *type = "";
+            int len = strlen(arg);
+            
+            if (strstr(arg, ".c") == arg + len - 2) {
+                type = "C source code";
+            } else if (strstr(arg, ".h") == arg + len - 2) {
+                type = "C/C++ header file";
+            } else if (strstr(arg, ".hpp") == arg + len - 4 || strstr(arg, ".hxx") == arg + len - 4) {
+                type = "C++ header file";
+            } else if (strstr(arg, ".cpp") == arg + len - 4 || 
+                       strstr(arg, ".cc") == arg + len - 3 || 
+                       strstr(arg, ".cxx") == arg + len - 4) {
+                type = "C++ source code";
             }
-            else if (i >= 2 && strcmp(argv[i-1], "-I") == 0)
-            {
-                printf("%s: include directory name.\n", argv[i]);
-                i++;
-            }
-            else if (strncmp(argv[i], "-std=", 5) == 0)
-            {
-                char *suffix = argv[i] + 5;
-                char type[128];
-                if (strncmp(suffix, "c++", 3) == 0)
-                {
-                    snprintf(type, sizeof(type), "ISO %s", suffix);
-                }
-                else if (strncmp(suffix, "gnu++", 5) == 0)
-                {
-                    snprintf(type, sizeof(type), "GNU dialect of %s", suffix+3);
-                }
-                else if (strncmp(suffix, "gnu", 3) == 0)
-                {
-                    snprintf(type, sizeof(type), "GNU dialect of %s", suffix+3);
-                }
-                else
-                {
-                    snprintf(type, sizeof(type), "ISO %s", suffix);
-                }
-                printf("-std=%s: Set the language standard to %s.\n", suffix, type);
-                i++;
-            }
-            else
-            {
-                char *ext = strrchr(argv[i], '.');
-                const char *desc = "unknown";
-                if (ext != NULL)
-                {
-                    if (strcmp(ext, ".c") == 0)
-                        desc = "C source code";
-                    else if (strcmp(ext, ".h") == 0)
-                        desc = "C/C++ header file";
-                    else if (strcmp(ext, ".cpp") == 0 || strcmp(ext, ".cc") == 0 || strcmp(ext, ".cxx") == 0)
-                        desc = "C++ source code";
-                    else if (strcmp(ext, ".hpp") == 0 || strcmp(ext, ".hxx") == 0)
-                        desc = "C++ header file";
-                }
-                printf("%s: %s as input file.\n", argv[i], desc);
-                i++;
-            }
+            
+            printf("%s: %s as input file.\n", arg, type);
         }
     }
+
+ 
     return 0;
 }
     
