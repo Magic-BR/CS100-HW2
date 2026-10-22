@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     /* TODO: your code here */
     (void)argc;
     (void)argv;
-     int i = 1;
+      int i = 1;
     while (i < argc)
     {
         if (strcmp(argv[i], "-Wall") == 0)
@@ -48,17 +48,17 @@ int main(int argc, char *argv[])
         {
             char *suffix = argv[i] + 5;
             char desc[256];
-            if (strstr(suffix, "c++") == suffix)
+            if (strncmp(suffix, "gnu++", 5) == 0)
+            {
+                snprintf(desc, sizeof(desc), "GNU dialect of %s", suffix + 3);
+            }
+            else if (strncmp(suffix, "gnu", 3) == 0)
+            {
+                snprintf(desc, sizeof(desc), "GNU dialect of %s", suffix + 3);
+            }
+            else if (strncmp(suffix, "c++", 3) == 0)
             {
                 snprintf(desc, sizeof(desc), "ISO %s", suffix);
-            }
-            else if (strstr(suffix, "gnu++") == suffix)
-            {
-                snprintf(desc, sizeof(desc), "GNU dialect of %s", suffix + 3);
-            }
-            else if (strstr(suffix, "gnu") == suffix)
-            {
-                snprintf(desc, sizeof(desc), "GNU dialect of %s", suffix + 3);
             }
             else
             {
@@ -69,19 +69,26 @@ int main(int argc, char *argv[])
         }
         else
         {
-            // 普通源文件/头文件
             char *ext = strrchr(argv[i], '.');
             const char *file_type = "unknown";
             if (ext != NULL)
             {
                 if (strcmp(ext, ".c") == 0)
-                    file_type = "C source code";
+                {
+                    file_type = "C source file";
+                }
                 else if (strcmp(ext, ".h") == 0)
+                {
                     file_type = "C/C++ header file";
+                }
                 else if (strcmp(ext, ".cpp") == 0 || strcmp(ext, ".cc") == 0 || strcmp(ext, ".cxx") == 0)
-                    file_type = "C++ source code";
+                {
+                    file_type = "C++ source file";
+                }
                 else if (strcmp(ext, ".hpp") == 0 || strcmp(ext, ".hxx") == 0)
+                {
                     file_type = "C++ header file";
+                }
             }
             printf("%s: %s as input file.\n", argv[i], file_type);
             i++;
